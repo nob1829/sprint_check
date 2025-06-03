@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <title>ランニングフォーム評価</title>
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    h2 { margin-top: 40px; }
-    .person-block { border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 20px; }
-    label { display: block; margin-top: 10px; }
-    input[type=range] { width: 100%; }
-    output { margin-left: 10px; font-weight: bold; }
+    body {{ font-family: sans-serif; margin: 20px; }}
+    h2 {{ margin-top: 40px; }}
+    .person-block {{ border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 20px; }}
+    label {{ display: block; margin-top: 10px; }}
+    input[type=range] {{ width: 100%; }}
+    output {{ margin-left: 10px; font-weight: bold; }}
   </style>
 </head>
 <body>
@@ -32,79 +32,79 @@
 
     const container = document.getElementById('formSection');
 
-    for (let i = 1; i <= NUM_PEOPLE; i++) {
+    for (let i = 1; i <= NUM_PEOPLE; i++) {{
       const personBlock = document.createElement('div');
       personBlock.className = 'person-block';
       personBlock.dataset.person = i;
 
       const header = document.createElement('h2');
-      header.textContent = `No.${i}`;
+      header.textContent = `No.${{i}}`;
       personBlock.appendChild(header);
 
-      CRITERIA.forEach((crit, idx) => {
+      CRITERIA.forEach((crit) => {{
         const label = document.createElement('label');
-        label.textContent = `${crit}（Poor〜Good）`;
+        label.textContent = `${{crit}}（Poor〜Good）`;
 
         const slider = document.createElement('input');
         slider.type = 'range';
         slider.min = 0;
         slider.max = 4;
         slider.step = 0.1;
-        slider.name = `P${i}_${['腕', '脚', '体幹＋頭', '連動性'][idx]}`;
+        slider.name = `P${{i}}_${{crit}}`;
 
         const out = document.createElement('output');
         out.textContent = '2.0';
 
-        slider.addEventListener('input', () => {
+        slider.addEventListener('input', () => {{
           out.textContent = slider.value;
-        });
+        }});
         slider.value = 2.0;
 
         label.appendChild(slider);
         label.appendChild(out);
         personBlock.appendChild(label);
-      });
+      }});
 
       container.appendChild(personBlock);
-    }
+    }}
 
-    function loadPreviousData() {
+    function loadPreviousData() {{
       const evaluatorID = document.querySelector('[name=evaluator]').value;
-      if (!evaluatorID) {
+      if (!evaluatorID) {{
         alert("評価者IDを入力してください。");
         return;
-      }
+      }}
 
-      fetch(`https://script.google.com/macros/s/AKfycbwR1QN6PZTSK9NymRb7V6PP5mqe69TM_5-_bOpGsnkMRSa0iwOxNgNYN1Nkqva4mgnocQ/exec?evaluator=${encodeURIComponent(evaluatorID)}`)
+      fetch(`https://script.google.com/macros/s/AKfycbwR1QN6PZTSK9NymRb7V6PP5mqe69TM_5-_bOpGsnkMRSa0iwOxNgNYN1Nkqva4mgnocQ/exec?evaluator=${{encodeURIComponent(evaluatorID)}}`)
         .then(response => response.json())
-        .then(data => {
-          if (data.length === 0) {
+        .then(data => {{
+          if (data.length === 0) {{
             alert("保存されたデータが見つかりません。");
             return;
-          }
-          const flat = Object.fromEntries(Object.entries(data[0]));
-          for (const [key, val] of Object.entries(flat)) {
-            const input = document.querySelector(`[name='${key}']`);
-            if (input) {
+          }}
+          const flat = Object.fromEntries(data[0].map((val, idx) => [Object.keys(data[0])[idx], val]));
+          for (const [key, val] of Object.entries(flat)) {{
+            const input = document.querySelector(`[name='${{key}}']`);
+            if (input) {{
               input.value = val;
               input.dispatchEvent(new Event('input'));
-            }
-          }
-        })
+            }}
+          }}
+        }})
         .catch(err => alert("データの取得に失敗しました。"));
-    }
+    }}
 
-    document.getElementById('evalForm').addEventListener('submit', function(e) {
+    document.getElementById('evalForm').addEventListener('submit', function(e) {{
       e.preventDefault();
       const data = new FormData(this);
-      fetch('https://script.google.com/macros/s/AKfycbwR1QN6PZTSK9NymRb7V6PP5mqe69TM_5-_bOpGsnkMRSa0iwOxNgNYN1Nkqva4mgnocQ/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbwR1QN6PZTSK9NymRb7V6PP5mqe69TM_5-_bOpGsnkMRSa0iwOxNgNYN1Nkqva4mgnocQ/exec', {{
         method: 'POST',
         body: data
-      }).then(res => {
+      }}).then(res => {{
         alert('送信が完了しました。');
         this.reset();
-      }).catch(err => alert('送信に失敗しました'));
-    });
+      }}).catch(err => alert('送信に失敗しました'));
+    }});
   </script>
 </body>
 </html>
