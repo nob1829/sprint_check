@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ランニングフォーム評価</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    h2 { margin-top: 40px; }
+    .person-block { border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 20px; }
+    label { display: block; margin-top: 10px; }
+    .slider-wrapper { position: relative; margin-top: 10px; }
+    .labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9em;
+      margin-bottom: 4px;
+      padding: 0 2px;
+    }
+    input[type=range] {
+      width: 100%;
+      appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 6px;
+      background: #ddd;
+      border-radius: 3px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #007bff;
+      border-radius: 50%;
+      margin-top: -5px;
+    }
+    datalist {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    datalist option {
+      width: 1px;
+      height: 10px;
+      background: black;
+    }
+  </style>
+</head>
+<body>
+  <h1>ランニングフォーム評価フォーム</h1>
+  <form id="evalForm">
+    <label>評価者ID：<input type="text" name="evaluator" required></label>
+    <div id="formSection"></div>
+    <button type="submit">送信</button>
+  </form>
+
+  <script>
+    const NUM_PEOPLE = 1;
+    const CRITERIA = [
+      '腕（腕の角度，スイングの方向，肩や手の力みなど）',
+      '脚（脚の角度，接地位置，軌道など）',
+      '体幹＋頭（上半身の姿勢，目線，捻転など）',
+      '連動性（左右の脚，手足のタイミングなど）'
+    ];
+
+    const container = document.getElementById('formSection');
+
+    for (let i = 1; i <= NUM_PEOPLE; i++) {
+      const personBlock = document.createElement('div');
+      personBlock.className = 'person-block';
+      personBlock.dataset.person = i;
+
+      const header = document.createElement('h2');
+      header.textContent = `No.${i}`;
+      personBlock.appendChild(header);
+
+      CRITERIA.forEach((crit) => {
+        const label = document.createElement('label');
+        label.textContent = `${crit}`;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'slider-wrapper';
+
+        const labelBar = document.createElement('div');
+        labelBar.className = 'labels';
+        labelBar.innerHTML = '<span>Poor</span><span>Normal</span><span>Good</span>';
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = 0;
+        slider.max = 4;
+        slider.step = 0.1;
+        slider.name = `P${i}_${crit}`;
+        slider.setAttribute('list', `ticks${i}`);
+
+        const ticks = document.createElement('datalist');
+        ticks.id = `ticks${i}`;
+        [0, 2, 4].forEach(val => {
+          const option = document.createElement('option');
+          option.value = val;
+          ticks.appendChild(option);
+        });
+
+        wrapper.appendChild(labelBar);
+        wrapper.appendChild(slider);
+        wrapper.appendChild(ticks);
+        label.appendChild(wrapper);
+        personBlock.appendChild(label);
+      });
+
+      container.appendChild(personBlock);
+    }
+  </script>
+</body>
+</html>
