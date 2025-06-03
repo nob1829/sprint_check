@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ランニングフォーム評価</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    h2 { margin-top: 40px; }
+    .person-block { border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 20px; }
+    label { display: block; margin-top: 10px; }
+    input[type=range] { width: 100%; }
+    output { margin-left: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>ランニングフォーム評価フォーム</h1>
+  <form id="evalForm">
+    <label>評価者ID：<input type="text" name="evaluator" required></label>
+    <button type="button" onclick="loadPreviousData()">保存済みデータを呼び出す</button>
+    <div id="formSection"></div>
+    <button type="submit">送信</button>
+  </form>
+
+  <script>
+    const NUM_PEOPLE = 80;
+    const CRITERIA = [
+      '腕（腕の角度，スイングの方向，肩や手の力みなど）',
+      '脚（脚の角度，接地位置，軌道など）',
+      '体幹＋頭（上半身の姿勢，目線，捻転など）',
+      '連動性（左右の脚，手足のタイミングなど）'
+    ];
+
+    const container = document.getElementById('formSection');
+
+    for (let i = 1; i <= NUM_PEOPLE; i++) {
+      const personBlock = document.createElement('div');
+      personBlock.className = 'person-block';
+      personBlock.dataset.person = i;
+
+      const header = document.createElement('h2');
+      header.textContent = `No.${i}`;
+      personBlock.appendChild(header);
+
+      CRITERIA.forEach((crit, idx) => {
+        const label = document.createElement('label');
+        label.textContent = `${crit}（Poor〜Good）`;
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = 0;
+        slider.max = 4;
+        slider.step = 0.1;
+        slider.name = `P${i}_${['腕', '脚', '体幹＋頭', '連動性'][idx]}`;
+
+        const out = document.createElement('output');
+        out.textContent = '2.0';
+
+        slider.addEventListener('input', () => {
+          out.textContent = slider.value;
+        });
+        slider.value = 2.0;
+
+        label.appendChild(slider);
+        label.appendChild(out);
+        personBlock.appendChild(label);
+      });
+
+      container.appendChild(personBlock);
+    }
+
+    function loadPreviousData() {
+      const evaluatorID = document.querySelector('[name=evaluator]').value;
+      if (!evaluatorID) {
+        alert("評価者IDを入力してください。");
+        return;
+      }
+
+      fetch(`https://script.google.com/macros/s/AKfycbwR1QN6PZTSK9NymRb7V6PP5mqe69TM_5-_bOpGsnkMRSa0iwOxNgNYN1Nkqva4mgnocQ/exec?evaluator=${encodeURIComponent(evaluatorID)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.length === 0) {
+            alert("保存されたデータが見つかりません。");
+            return;
+          }
+          const flat = Object.fromEntries(Object.entries(data[0]));
+          for (const [key, val] of Object.entries(flat)) {
+            const input = document.querySelector(`[name='${key}']`);
+            if (input) {
+              input.value = val;
+              input.dispatchEvent(new Event('input'));
+            }
+          }
+        })
+        .catch(err => alert("データの取得に失敗しました。"));
+    }
+
+    document.getElementById('evalForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const data = new FormData(this);
+      fetch('https://script.google.com/macros/s/AKfycbwR1QN6PZTSK9NymRb7V6PP5mqe69TM_5-_bOpGsnkMRSa0iwOxNgNYN1Nkqva4mgnocQ/exec', {
+        method: 'POST',
+        body: data
+      }).then(res => {
+        alert('送信が完了しました。');
+        this.reset();
+      }).catch(err => alert('送信に失敗しました'));
+    });
+  </script>
+</body>
+</html>
