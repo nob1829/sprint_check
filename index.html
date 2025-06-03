@@ -84,7 +84,7 @@
 
         const labelBar = document.createElement('div');
         labelBar.className = 'labels';
-        labelBar.innerHTML = '<span>Poor</span><span>Normal</span><span>Good</span>';
+        labelBar.innerHTML = '<span>BAD</span><span>POOR</span><span>NORMAL</span><span>GOOD</span><span>EXCELLENT</span>';
 
         const slider = document.createElement('input');
         slider.type = 'range';
@@ -96,7 +96,7 @@
 
         const ticks = document.createElement('datalist');
         ticks.id = `ticks${i}`;
-        [0, 2, 4].forEach(val => {
+        [0, 1, 2, 3, 4].forEach(val => {
           const option = document.createElement('option');
           option.value = val;
           ticks.appendChild(option);
